@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
         JFrame obj = new JFrame();
         Gameplay gamePlay = new Gameplay();
-        obj.setBounds(10,10,695,598);
+        obj.setBounds(10,10,575,658);
         obj.setTitle("game");
         obj.setResizable(false);
         obj.setVisible(true);

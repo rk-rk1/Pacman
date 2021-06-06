@@ -11,12 +11,12 @@ import java.util.TimerTask;
 public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     private final int gridSize=20;
     // all things that move on he board, plaer is idex 0
-    private int[] movXGrid ={10};
-    private int[] movYGrid ={10};
-    private int[] movX={gridSize* movXGrid[0]};
-    private int[] movY={gridSize* movYGrid[0]};
+    private final int[] movXGrid ={12};
+    private final int[] movYGrid ={10};
+    private final int[] movX={gridSize* movXGrid[0]};
+    private final int[] movY={gridSize* movYGrid[0]};
 
-    private int delay=5;
+    private final int delay=10;
 
     private boolean rightK=false;
     private boolean leftK=false;
@@ -25,18 +25,41 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
 
     private boolean playerMovementIsCalled=false;
 
-
-    //private int playerXgrid=10;
-    //private int playerYgrid=10;
-    //private int playerX=gridSize*playerXgrid;
-    //private int playerY=gridSize*playerYgrid;
-
-    private Timer timer= new Timer();
+    private final Timer timer= new Timer();
     private int movingball;
-    private int[][] map= {
-            {1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,1,0,0,0,1},
-            {1,0,1,0,1,0,1,0,1}
+    private final int[][] map= {
+//           0   2   4   6   8  10   12  14
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, //0
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}, //1
+            {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //2
+            {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //3
+            {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //4
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, //5
+            {1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1}, //6
+            {1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1}, //7
+            {1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1}, //8
+            {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1}, //9
+            {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1}, //10
+            {1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1}, //11
+            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //12
+            {1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1}, //13
+            {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1}, //14
+            {1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1}, //15
+            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //16
+            {1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1}, //17
+            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //18
+            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //19
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}, //20
+            {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //21
+            {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //22
+            {1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1}, //23
+            {1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1}, //24
+            {1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1}, //25
+            {1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1}, //26
+            {1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1}, //27
+            {1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1}, //28
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}, //29
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     };
 
     public Gameplay() {
@@ -48,12 +71,21 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     }
 
     public void paint(Graphics obj) {
-
         obj.setColor(Color.black);
         obj.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         obj.setColor(Color.white);
         obj.setFont(new Font("serif", Font.BOLD, 25));
+
+        obj.setColor(Color.white);
+        for (int i =0; i<map.length; i++){
+            for (int j = 0; j < map[0].length; j++) {
+                if (map[i][j]==1){
+                    obj.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
+                }
+            }
+
+        }
 
         //Играч
         obj.setColor(Color.magenta);
@@ -101,8 +133,6 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
             playerMovement();
             playerMovementIsCalled=true;
         }
-        int wide=this.getWidth();
-        int hight= this.getHeight();
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             rightK=true;
             leftK=false;
@@ -130,19 +160,24 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         }
     }
 
+    public boolean isPassable(int x, int y){
+        if (map[y][x]==1) return false;
+        return true;
+    }
+
     public void playerMovement(){
         int wide = this.getWidth();
         int hight= this.getHeight();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(rightK && movX[0] < wide-gridSize*2)
+                if(rightK && movX[0] < wide-gridSize*2 && isPassable(movXGrid[0]+1, movYGrid[0]))
                     moveRight();
-                else if(leftK && movX[0] >= 20)
+                else if(leftK && movX[0] >= 20 && isPassable(movXGrid[0]-1, movYGrid[0]))
                     moveLeft();
-                else if(upK && movY[0] >= 20)
+                else if(upK && movY[0] >= 20 && isPassable(movXGrid[0], movYGrid[0]-1))
                     moveUp();
-                else if(downK && movY[0] < hight-gridSize*2)
+                else if(downK && movY[0] < hight-gridSize*2 && isPassable(movXGrid[0], movYGrid[0]+1))
                     moveDown();
                 System.out.println(movXGrid[0]+ "  "+ movYGrid[0]);
             }
