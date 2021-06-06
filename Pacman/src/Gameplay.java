@@ -10,7 +10,7 @@ import java.util.TimerTask;
 //import java.util.Timer;
 public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     private final int gridSize=20;
-    // all things that move on he board, plaer is idex 0
+    // all things that move on he board, player is index 0
     private final int[] movXGrid ={12};
     private final int[] movYGrid ={10};
     private final int[] movX={gridSize* movXGrid[0]};
@@ -18,15 +18,16 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
 
     private final int delay=10;
 
+    //key being pressed
     private boolean rightK=false;
     private boolean leftK=false;
     private boolean upK=false;
     private boolean downK=false;
 
-    private boolean playerMovementIsCalled=false;
+    private boolean playerMovementIsCalled=false; //to stop repeated calling of "playerMovement()"
 
     private final Timer timer= new Timer();
-    private int movingball;
+    private int movingball; // remove at some point
     private final int[][] map= {
 //           0   2   4   6   8  10   12  14
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, //0
@@ -161,8 +162,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     }
 
     public boolean isPassable(int x, int y){
-        if (map[y][x]==1) return false;
-        return true;
+        return map[y][x] != 1;
     }
 
     public void playerMovement(){
@@ -184,8 +184,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         },0, delay*20+delay/2);
     }
 
-
-    // entity - poiting to the entity index in mov arrays,
+    // entity - pointing to the entity index in mov arrays,
     // isUpDown - if true than its moving up or down(y) if false move left or right(x),
     // direction can be 1 or -1 changing Y or X by this much
     public void animation(int entity, boolean isUpDown, int direction){
