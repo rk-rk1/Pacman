@@ -4,17 +4,23 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JPanel;
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.lang.Math;
 
 //import java.util.Timer;
 public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     private final int gridSize=20;
     // all things that move on he board, player is index 0
-    private final int[] movXGrid ={12};
-    private final int[] movYGrid ={10};
-    private final int[] movX={gridSize* movXGrid[0]};
-    private final int[] movY={gridSize* movYGrid[0]};
+    private final int[] movXGrid ={14, 1};
+    private final int[] movYGrid ={23, 3};
+    private final int[] movX={gridSize* movXGrid[0], gridSize* movXGrid[1]};
+    private final int[] movY={gridSize* movYGrid[0], gridSize* movYGrid[1]};
+
+    private Ghost ghost1 =new Ghost(-3,-3, true, 1);
+
+    private int score=0;
 
     private final int delay=10;
 
@@ -29,7 +35,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     private final Timer timer= new Timer();
     private int movingball; // remove at some point
     private final int[][] map= {
-//           0   2   4   6   8  10   12  14
+//           0   2   4   6   8  10   12  14  16  17 18   19  20  22
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, //0
             {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}, //1
             {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //2
@@ -39,36 +45,86 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
             {1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1}, //6
             {1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1}, //7
             {1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1}, //8
-            {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1}, //9
-            {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1}, //10
-            {1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1}, //11
-            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //12
-            {1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1}, //13
-            {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1}, //14
-            {1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1}, //15
-            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //16
-            {1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1}, //17
-            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //18
-            {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1}, //19
+            {1,1,1,1,1,1,0,1,1,1,1,1,2,1,1,2,1,1,1,1,1,0,1,1,1,1,1,1}, //9
+            {1,1,1,1,1,1,0,1,1,1,1,1,2,1,1,2,1,1,1,1,1,0,1,1,1,1,1,1}, //10
+            {1,1,1,1,1,1,0,1,1,2,2,2,2,2,2,2,2,2,2,1,1,0,1,1,1,1,1,1}, //11
+            {1,1,1,1,1,1,0,1,1,2,1,1,1,3,3,1,1,1,2,1,1,0,1,1,1,1,1,1}, //12 dor
+            {1,1,1,1,1,1,0,1,1,2,1,2,2,2,2,2,2,1,2,1,1,0,1,1,1,1,1,1}, //13
+            {1,0,0,0,0,0,0,2,2,2,1,2,2,2,2,2,2,1,2,2,2,0,0,0,0,0,0,1}, //14
+            {1,1,1,1,1,1,0,1,1,2,1,2,2,2,2,2,2,1,2,1,1,0,1,1,1,1,1,1}, //15
+            {1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1}, //16
+            {1,1,1,1,1,1,0,1,1,2,2,2,2,2,2,2,2,2,2,1,1,0,1,1,1,1,1,1}, //17
+            {1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1}, //18
+            {1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1}, //19
             {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}, //20
             {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //21
             {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1}, //22
-            {1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1}, //23
+            {1,0,0,0,1,1,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,1,1,0,0,0,1}, //23
             {1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1}, //24
             {1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1}, //25
             {1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1}, //26
             {1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1}, //27
             {1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1}, //28
             {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}, //29
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}  //30
     };
+
+    private void ghost1(){
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                ghost1.setTargetXY(movXGrid[0], movYGrid[0]);
+                double up= Integer.MAX_VALUE, down= Integer.MAX_VALUE, right = Integer.MAX_VALUE, left= Integer.MAX_VALUE;
+                //up
+                System.out.println(movXGrid[1]+" "+  movYGrid[1]);
+                if (isPassable(movXGrid[1],movYGrid[1]-1) && (!ghost1.isMovingUpDown() || ghost1.getDirection()==-1)){
+                    System.out.println("up");
+                    up = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1],2)+ Math.pow(movYGrid[0]-movYGrid[1]-1,2));
+                }
+                //down
+                if (isPassable(movXGrid[1],movYGrid[1]+1) && (!ghost1.isMovingUpDown()) || ghost1.getDirection()==1){
+                    System.out.println("d");
+                    down = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1],2)+ Math.pow(movYGrid[0]-movYGrid[1]+1,2));
+                }
+                //left
+                if (isPassable(movXGrid[1]-1,movYGrid[1]) && (ghost1.isMovingUpDown()) || ghost1.getDirection()==-1){
+                    System.out.println("left");
+                    left = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1]-1,2)+ Math.pow(movYGrid[0]-movYGrid[1],2));
+                }
+                //right
+                if (isPassable(movXGrid[1]+1,movYGrid[1]) && (ghost1.isMovingUpDown()) || ghost1.getDirection()==+1){
+                    System.out.println("right");
+                    right = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1]+1,2)+ Math.pow(movYGrid[0]-movYGrid[1],2));
+                }
+
+                if (up<=down && up<=left && up<=right){
+                    ghost1.setDirection(-1);
+                    ghost1.setMovingUpDown(true);
+                }
+                else if (down<=up && down<=left && down<=right){
+                    ghost1.setDirection(1);
+                    ghost1.setMovingUpDown(true);
+                }
+                else if (right<=down && right<=left && right<=up){
+                    ghost1.setDirection(1);
+                    ghost1.setMovingUpDown(false);
+                }
+                else if (left<=down && left<=right && left<=up){
+                    ghost1.setDirection(-1);
+                    ghost1.setMovingUpDown(false);
+                }
+
+                animation(1, ghost1.isMovingUpDown(), ghost1.getDirection());
+            }
+        },delay*22,delay*22);
+    }
 
     public Gameplay() {
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-
         automaticActions();
+        ghost1();
     }
 
     public void paint(Graphics obj) {
@@ -81,15 +137,23 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         obj.setColor(Color.white);
         for (int i =0; i<map.length; i++){
             for (int j = 0; j < map[0].length; j++) {
-                if (map[i][j]==1){
+                if (map[i][j]==0){
+                    obj.fillRect(j*gridSize +gridSize*2/5, i*gridSize+gridSize*2/5, gridSize/5, gridSize/5);
+                }
+                else if(map[i][j]==3){     /////pacman stop at door///
+                    obj.fillRect(j*gridSize, i*gridSize+gridSize*2/5, gridSize, gridSize/5);
+                }
+                //
+                else if (map[i][j]==1){
                     obj.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                 }
             }
-
         }
+        obj.setColor(Color.red);
+        obj.fillRect(movX[1], movY[1], gridSize, gridSize);//ghost
 
-        //Играч
         obj.setColor(Color.magenta);
+        obj.drawString(String.valueOf(score), 30,637);
         obj.fillRect(movX[0], movY[0], gridSize, gridSize);
         obj.fillOval(movingball, 300, 20, 20);
 
@@ -113,6 +177,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     public void keyTyped(KeyEvent e) {}
     @Override
     public void keyReleased(KeyEvent e) {
+        /*
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             rightK=false;
         }
@@ -125,7 +190,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         }
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             downK=false;
-        }
+        }*/
     }
 
     @Override
@@ -134,26 +199,26 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
             playerMovement();
             playerMovementIsCalled=true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && isPassable(movXGrid[0]+1, movYGrid[0])) {
             rightK=true;
             leftK=false;
             upK=false;
             downK=false;
         }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && isPassable(movXGrid[0]-1, movYGrid[0])) {
             leftK=true;
             rightK=false;
             upK=false;
             downK=false;
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
+        if (e.getKeyCode() == KeyEvent.VK_UP && isPassable(movXGrid[0], movYGrid[0]-1)) {
             upK=true;
             leftK=false;
             rightK=false;
             downK=false;
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && isPassable(movXGrid[0], movYGrid[0]+1)) {
             downK=true;
             leftK=false;
             upK=false;
@@ -162,7 +227,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     }
 
     public boolean isPassable(int x, int y){
-        return map[y][x] != 1;
+        return map[y][x] != 1 && map[y][x] != 3;
     }
 
     public void playerMovement(){
@@ -171,6 +236,12 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                //new stuff
+                if (map[movYGrid[0]][movXGrid[0]] == 0){
+                    map[movYGrid[0]][movXGrid[0]] = 2;
+                    score+=10;
+                }
+
                 if(rightK && movX[0] < wide-gridSize*2 && isPassable(movXGrid[0]+1, movYGrid[0]))
                     moveRight();
                 else if(leftK && movX[0] >= 20 && isPassable(movXGrid[0]-1, movYGrid[0]))
@@ -179,7 +250,8 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
                     moveUp();
                 else if(downK && movY[0] < hight-gridSize*2 && isPassable(movXGrid[0], movYGrid[0]+1))
                     moveDown();
-                System.out.println(movXGrid[0]+ "  "+ movYGrid[0]);
+                //System.out.println(movXGrid[0]+ "  "+ movYGrid[0]);
+
             }
         },0, delay*20+delay/2);
     }
@@ -193,8 +265,8 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                movY[0]+=direction;
-                if(movY[entity]%10==0&&movY[0]%20!=0){
+                movY[entity]+=direction;
+                if(movY[entity]%10==0&&movY[entity]%20!=0){
                     movYGrid[entity]+=direction;
                 }
                 if (movY[entity]%20==0){

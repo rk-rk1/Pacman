@@ -2,7 +2,7 @@ public class Ghost {
 
     private int id;
 
-    private int scatterTargeX;
+    private int scatterTargetX;
     private int scatterTargetY;
 
     private int targetX;
@@ -20,14 +20,30 @@ public class Ghost {
     private boolean inFrightened =false;
     //texture variable?
 
+
+    public boolean isMovingUpDown() {
+        return isMovingUpDown; }
+    public void setMovingUpDown(boolean movingUpDown) {
+        isMovingUpDown = movingUpDown; }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public void setDirection(int direction) {
+        if(direction==1||direction==-1)
+        this.direction = direction;
+    }
+
     public void chase(){
+        inChase_inEaten=true;
         direction=direction*(-1);
     }
 
     public void scatter(){
+        inChase_inEaten=false;
         direction=direction*(-1);
-        targetX=scatterTargeX;
-        targetY=scatterTargetY;
+        setTargetXY(scatterTargetX, scatterTargetY);
     }
 
     public void setTargetXY(int x, int y){
@@ -39,5 +55,12 @@ public class Ghost {
 
     }
 
+    public Ghost(int scatterTargetX, int scatterTargetY, boolean isMovingUpDown, int direction){
+
+        this.scatterTargetX=scatterTargetX;
+        this.scatterTargetY=scatterTargetY;
+        this.isMovingUpDown=isMovingUpDown;
+        this.direction=direction;
+    }
 
 }
