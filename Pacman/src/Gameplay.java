@@ -19,7 +19,8 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     private final int[] movY={gridSize* movYGrid[0], gridSize* movYGrid[1]};
 
     private Ghost ghost1 =new Ghost(-3,-3, true, 1);
-
+    // t/1 - nadolu
+    // t/-1 -nagore
     private int score=0;
 
     private final int delay=10;
@@ -33,7 +34,6 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
     private boolean playerMovementIsCalled=false; //to stop repeated calling of "playerMovement()"
 
     private final Timer timer= new Timer();
-    private int movingball; // remove at some point
     private final int[][] map= {
 //           0   2   4   6   8  10   12  14  16  17 18   19  20  22
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, //0
@@ -74,28 +74,31 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
             @Override
             public void run() {
                 ghost1.setTargetXY(movXGrid[0], movYGrid[0]);
-                double up= Integer.MAX_VALUE, down= Integer.MAX_VALUE, right = Integer.MAX_VALUE, left= Integer.MAX_VALUE;
+                double up= 60, down= 60, right = 60, left= 60;
                 //up
-                System.out.println(movXGrid[1]+" "+  movYGrid[1]);
                 if (isPassable(movXGrid[1],movYGrid[1]-1) && (!ghost1.isMovingUpDown() || ghost1.getDirection()==-1)){
-                    System.out.println("up");
+                    // System.out.println("up");
                     up = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1],2)+ Math.pow(movYGrid[0]-movYGrid[1]-1,2));
                 }
                 //down
-                if (isPassable(movXGrid[1],movYGrid[1]+1) && (!ghost1.isMovingUpDown()) || ghost1.getDirection()==1){
-                    System.out.println("d");
+                if (isPassable(movXGrid[1],movYGrid[1]+1) && (!ghost1.isMovingUpDown() || ghost1.getDirection()==1)){
+                    // System.out.println("d");
                     down = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1],2)+ Math.pow(movYGrid[0]-movYGrid[1]+1,2));
                 }
                 //left
-                if (isPassable(movXGrid[1]-1,movYGrid[1]) && (ghost1.isMovingUpDown()) || ghost1.getDirection()==-1){
-                    System.out.println("left");
+                if (isPassable(movXGrid[1]-1,movYGrid[1]) && (ghost1.isMovingUpDown() || ghost1.getDirection()==-1)){
+                    // System.out.println("left");
                     left = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1]-1,2)+ Math.pow(movYGrid[0]-movYGrid[1],2));
                 }
                 //right
-                if (isPassable(movXGrid[1]+1,movYGrid[1]) && (ghost1.isMovingUpDown()) || ghost1.getDirection()==+1){
-                    System.out.println("right");
+                if (isPassable(movXGrid[1]+1,movYGrid[1]) && (ghost1.isMovingUpDown() || ghost1.getDirection()==+1)){
+                    // System.out.println("right");
                     right = Math.sqrt((double) Math.pow(movXGrid[0]-movXGrid[1]+1,2)+ Math.pow(movYGrid[0]-movYGrid[1],2));
                 }
+
+                System.out.println(movXGrid[1]+" "+  movYGrid[1]);
+                System.out.println(up+ " "+ down+ " "+right+ " "+left);
+                // System.out.println(up);
 
                 if (up<=down && up<=left && up<=right){
                     ghost1.setDirection(-1);
@@ -155,7 +158,6 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         obj.setColor(Color.magenta);
         obj.drawString(String.valueOf(score), 30,637);
         obj.fillRect(movX[0], movY[0], gridSize, gridSize);
-        obj.fillOval(movingball, 300, 20, 20);
 
         obj.dispose();
     }
@@ -164,7 +166,6 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                movingball++;
                 repaint();
             }
         },8,8);
@@ -278,7 +279,7 @@ public class Gameplay  extends JPanel implements KeyListener, ActionListener{
             timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                movX[0]+=direction;
+                movX[entity]+=direction;
                 if(movX[entity]%10==0&&movX[0]%20!=0){
                     movXGrid[entity]+=direction;
                 }
